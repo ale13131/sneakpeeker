@@ -1,0 +1,85 @@
+Sub CompareWordList()
+    Dim sCheckDoc As String
+    Dim docRef As Document
+    Dim docCurrent As Document
+    Dim wrdRef As Object
+
+    sCheckDoc = "f:\class documents\cmps112\textlist.txt"
+    Set docCurrent = Selection.Document
+    Set docRef = Documents.Open(sCheckDoc)
+    docCurrent.Activate
+
+    With Selection.Find
+        .ClearFormatting
+        .Replacement.ClearFormatting
+        .Replacement.Font.Bold = True
+        .Replacement.Text = "^&"
+        .Forward = True
+        .Format = True
+        .MatchWholeWord = True
+        .MatchCase = False
+        .MatchWildcards = False
+    End With
+
+    For Each wrdRef In docRef.Words
+        If Asc(Left(wrdRef, 1)) > 32 Then
+            With Selection.Find
+                .Wrap = wdFindContinue
+                .Text = wrdRef
+                .Execute Replace:=wdReplaceAll
+            End With
+        End If
+    Next wrdRef
+
+    docRef.Close
+    docCurrent.Activate
+End Sub
+
+Sub HighlightFromTableList()
+  'Set the variables
+  Dim oHighlights As Document, oDoc As Document
+  Dim oTable As Table
+  Dim oRng As Range
+  Dim rFindText As Range
+  Dim i As Long
+  Dim sFname As String
+
+  'Change the path in the line below to reflect the name and path of the source words
+  sFname = "f:\class documents\cmps112\tests_\12q1-final.docx"
+
+  'The document to be highlighted
+  Set oDoc = ActiveDocument
+
+  'Open the source word doc
+  Set oHighlights = Documents.Open(FileName:=sFname)
+
+  'Find the first table
+  Set oTable = oHighlights.Tables(1)
+
+  'For each row in that table
+  For i = 1 To oTable.Rows.Count
+    Set oRng = oDoc.Range
+
+    'Get the text
+    Set rFindText = oTable.Cell(i, 1).Range
+
+    'Remove the cell ending characters
+    rFindText.End = rFindText.End - 1
+    With oRng.Find
+      .ClearFormatting
+      .Replacement.ClearFormatting
+
+      'Find all instances of the word
+      Do While .Execute(findText:=rFindText, MatchWholeWord:=True, MatchWildcards:=False, Forward:=True, MatchCase:=False) = True
+
+        'Highlight them in yellow
+        oRng.HighlightColorIndex = wdYellow
+      Loop
+    End With
+
+  'Get the next word to be found
+  Next i
+
+  'Close the source word doc
+  oHighlights.Close wdDoNotSaveChanges
+End Sub

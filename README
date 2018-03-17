@@ -1,0 +1,7 @@
+To use:
+
+1) take the sneak peek. convert it to tables see: textlist.docx
+2) open file to be searched
+3) create a macro.
+	1) View -> Macros -> (Just create a new one and copy paste highlightMacro into it)
+4) run the macro. should work idk
